@@ -2,6 +2,7 @@ package tiger;
 
 import java.awt.CardLayout;
 import java.awt.EventQueue;
+import java.awt.Frame;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
@@ -15,8 +16,11 @@ import javax.swing.JFrame;
 public class GridMainWindow2 implements KeyListener,FocusListener{
 
 	private JFrame frame;
+	int gap=10;
 	List<MyInternalFrame> myIFList=null;
+	FullScreen fs=new FullScreen();
 	boolean[] numberCoverShow={false,false,false,false,false,false,false,false,false,false,false,false,false};
+	boolean isFullScreen=false;
 	/**
 	 * Launch the application.
 	 */
@@ -43,6 +47,7 @@ public class GridMainWindow2 implements KeyListener,FocusListener{
 		initialize();
 		frame.addKeyListener(this);
 		frame.addFocusListener(this);
+
 	}
 
 	/**
@@ -61,13 +66,18 @@ public class GridMainWindow2 implements KeyListener,FocusListener{
 		desktopPane.setFocusable(true);
 //		desktopPane.addKeyListener(this);
 		
-
+//		frame.setExtendedState(Frame.MAXIMIZED_BOTH); 
+//		frame.setUndecorated(true);  
 		
 		myIFList=new ArrayList<MyInternalFrame>();
+		int gridW=frame.getWidth()/3;
+		int gridH=frame.getHeight()/2;
+
 		for(int i=0;i<2;i++){
 			for(int j=0;j<3;j++){
-			MyInternalFrame temp=new MyInternalFrame(6+160*j, 6+160*i, 146, 137);
+			MyInternalFrame temp=new MyInternalFrame(gap+gridW*j, gap+gridH*i, gridW-gap, gridH-gap);
 			desktopPane.add(temp);
+			
 //			temp.addFocusListener(this);
 			temp.addKeyListener(this);
 			myIFList.add(temp);
@@ -102,6 +112,38 @@ public class GridMainWindow2 implements KeyListener,FocusListener{
 			for(MyInternalFrame f:myIFList){
 				f.setShowLoseImage(!f.isShowLoseImage());
 			}
+		else if(key.equalsIgnoreCase("f")){
+			
+			isFullScreen=!isFullScreen;
+			System.out.println("full screen: "+isFullScreen);
+			if(isFullScreen){
+				JFrame newFrame=new JFrame();
+				newFrame.add(frame.getContentPane());
+				newFrame.setBounds(frame.getBounds());
+				frame.dispose();
+				
+				frame=newFrame;
+				
+				fs.setFullScreen(null, frame);
+		
+			}else{
+				JFrame newFrame=new JFrame();
+				newFrame.add(frame.getContentPane());
+				newFrame.setBounds(frame.getBounds());
+				fs.CloseFullScreen();
+				
+				frame=newFrame;
+				frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+				frame.setVisible(true);
+				
+			}
+			int gridW=frame.getWidth()/3;
+			int gridH=frame.getHeight()/2;
+			for(int i=0;i<2;i++){
+				for(int j=0;j<3;j++){
+					myIFList.get(i*3+j).setBounds(gap+gridW*j, gap+gridH*i, gridW-gap*2, gridH-gap*2);
+				}}
+		}
 		try{
 			int index=Integer.parseInt(key);
 			numberCoverShow[index-1]=!numberCoverShow[index-1];
